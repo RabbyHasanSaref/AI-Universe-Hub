@@ -6,22 +6,45 @@ const loadData = async(isShowAll) => {
 }
 
 const loadDataValue = (result, isShowAll) => {
-        const container = document.getElementById('container')
+        // console.log(result)
+        const container = document.getElementById('container');
+        container.innerHTML = "";
+
+        //sort by date btn
+        let sortData = result;
+        const sortBtn = document.getElementById('sort-btn');
+        sortBtn.addEventListener('click', function () {
+            const sorted = sortData.sort((a, b) => {
+                const dataA = a.published_in.split('/');
+                const dataB = b.published_in.split('/');
+                
+                //create object 
+                const dataObjA= new Date(dataA[2], dataA[0] - 1, dataA[1]);
+                const dataObjB= new Date(dataB[2], dataB[0] - 1, dataB[1]);
+
+                //compare date
+                return dataObjA - dataObjB;
+            })
+            sortData = sorted
+
+            // update sorting btn click data .....function call
+            loadDataValue(sortData, isShowAll);
+        })
 
         // ------------------------showl All conditon------------
         const show = document.getElementById('showbutton');
-        if(result.length > 2 && !isShowAll){
-            show.classList.remove('hidden')
+        if(sortData.length > 2 && !isShowAll){
+            show.classList.remove('hidden');
         }
         else{
             show.classList.add('hidden');
         }
         if(!isShowAll){
-            result = result.slice(0, 6);
+            sortData = sortData.slice(0, 6);
         }
 
     // ------------------first part------------------
-        result.forEach(results =>{
+        sortData.forEach(results =>{
             // console.log(results)
             const cardContainer = document.createElement('div');
             cardContainer.classList = 'card bg-base-100 shadow-xl';
@@ -44,7 +67,7 @@ const loadDataValue = (result, isShowAll) => {
                 </div>
               </div>
             </div>
-            `
+            `;
             container.appendChild(cardContainer);
         })
 }
@@ -61,8 +84,8 @@ const showModal = async (id) => {
     const res = await fetch(`https://openapi.programming-hero.com/api/ai/tool/${id}`);
     const data = await res.json();
     const values = data.data;
-    // console.log(values)
-    modalData(values)
+    // console.log(values);
+    modalData(values);
 
 }
 
@@ -73,7 +96,7 @@ const modalData = (datas) => {
    const containere = document.getElementById('image');
    containere.innerHTML = `
    <img src="${datas.image_link[0]}" alt="">
-   `
+   `;
    const title = document.getElementById('title');
    title.innerText = datas.input_output_examples[0].input;
 
@@ -83,8 +106,8 @@ const modalData = (datas) => {
 
 // --------------show All--------------
 const showAll = () => {
-    loadData(true)
+    loadData(true);
 }
 
 // -----------api handel-------------
-loadData()
+loadData();
